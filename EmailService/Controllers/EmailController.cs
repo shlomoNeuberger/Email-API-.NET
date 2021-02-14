@@ -12,12 +12,12 @@ namespace EmailService.Controllers
         {
             public string subject;
             public string body;
-            public string displayName;
             public string[] distantions;
             public string emailUserAdress;
             public string emailPass;
-            public string smtpDomain;
-            public string fileName;
+            public string displayName; //optinal defualt same as emailUserAdress
+            public string smtpDomain; //optinal  defualt is Gmail
+            //public string fileName;
         }
         // GET: api/Email
         public IEnumerable<string> Get()
@@ -32,9 +32,10 @@ namespace EmailService.Controllers
         }
 
         // POST: api/Email
-        public void Post([FromBody]Email emailParms)
+        public string Post([FromBody]Email emailParms)
         {
-            SendAlertEmail(emailParms);
+            string res = SendAlertEmail(emailParms);
+            return res;
         }
 
         // PUT: api/Email/5
@@ -47,8 +48,9 @@ namespace EmailService.Controllers
         {
         }
 
-        private void SendAlertEmail(Email email)
+        private string SendAlertEmail(Email email)
         {
+            List<string> respone = new List<string>();
             try
             {
                 MailMessage mail = new MailMessage();
@@ -58,10 +60,11 @@ namespace EmailService.Controllers
 
                 if (email.distantions.Length < 1)
                 {
-                    mail.To.Add(Error_mail);
+                    respone.Add("\"Error Msg\":\"No distantion\"");
                 }
                 else
                 {
+                    string errorInMailAddres = string.Empty;
                     foreach (string dis in email.distantions)
                     {
                         if (dis != string.Empty)
@@ -70,9 +73,6 @@ namespace EmailService.Controllers
                         }
                     }
                 }
-
-
-
                 mail.Subject = email.subject;
                 mail.IsBodyHtml = true;
                 mail.Body = email.body;
@@ -85,8 +85,9 @@ namespace EmailService.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                respone.Add($"\"Exception Msg\":\"{ex.Message}\"");
             }
+            return respone.Count >=1? "{\"OK\":false," +     String.Join(",\n",respone)   +"}":"{\"OK\":\"OK\"}";
         }
 
     }
