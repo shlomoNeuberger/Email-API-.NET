@@ -1,4 +1,4 @@
-# EmailApi
+# Simple Email Sending Api
 ## The Email api is based on the defult VS ASP.NET project
 The POST methode accepts JSON that complaies to the next struct:
 ```C#
