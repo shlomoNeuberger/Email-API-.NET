@@ -14,16 +14,21 @@ public struct Email
         }
 
 ```
+by defult it will send via gmail smtp but it can be changed with adding ```"smtpDomain":"smtp.domain..."``` to the POST data.
 
 ### Exemple POST JSON
 ```JSON
 {
     "subject":"Hello World",
     "body":"<!DOCTYPE html><html><body><h1>הכותרת הראשונה שלי</h1><h1>This is heading 1</h1><h2>This is heading 2</h2><h3>This is heading 3</h3><p>פיסקהl ראשונה</p></body></html>",
-    "emailUserAdress":"ExamSenderBot@gmail.com",
-    "emailPass":"!Q2w3e4r5t",
+    "emailUserAdress":"user@domain.com",
+    "emailPass":"password",
     "displayName":"מערכת בדיקה",
-    "distantions":["shlomo@neuberger.co.il",""]
+    "distantions":["user1@domain.co.il","user2@domain.co.il"]
 }
 ```
 
+
+## Sending file
+Adding attachment to the request, should be with your form data.
+The important part is that the email arameters specified above will be under the key ```email_parms```
