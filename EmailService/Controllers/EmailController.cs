@@ -34,17 +34,8 @@ namespace EmailService.Controllers
             }
             //public string fileName;
         }
-        // GET: api/Email
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "Get method Recived" };
-        }
-
-        // GET: api/Email/5
-        public string Get(int id)
-        {
-            return $"Get method Recived with id={id}";
-        }
+        
+        
 
         // POST: api/Email
         [ValidateInput(false)]
@@ -93,19 +84,6 @@ namespace EmailService.Controllers
                 HttpContext.Current.Response.StatusCode = 400;
                 return "{\"Error\":\"Invalid email parms\"";
             }
-        }
-
-
-    
-
-        // PUT: api/Email/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE: api/Email/5
-        public void Delete(int id)
-        {
         }
 
         private string SendAlertEmail(Email email,List<Attachment> attachments)
