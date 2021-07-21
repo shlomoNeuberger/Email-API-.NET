@@ -1,0 +1,56 @@
+﻿
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+
+<body>
+    <script>
+        function f() {
+            var data = JSON.stringify({
+                "subject": "Hello World",
+                "body": "<!DOCTYPE html><html><body><h1>הכותרת הראשונה שלי</h1><h1>This is heading 1</h1><h2>This is heading 2</h2><h3>This is heading 3</h3><p>פיסקהl ראשונה</p></body></html>",
+                "emailUserAdress": "ExamSenderBot@gmail.com",
+                "cc": [
+                    "shlomo.neuberger@gmail.com"
+                ],
+                "bcc": [
+                    "ExamSenderBot@gmail.com"
+                ],
+                "dirs": [
+                    "C:\\Users\\Shlomo\\Downloads\\z14-423-19b.pdf",
+                    "C:\\Users\\Shlomo\\Downloads\\z14-423-19.pdf",
+                    "C:\\Users\\Shlomo\\Downloads\\z14-423-19b.pdf"
+                ],
+                "emailPass": "!Q2w3e4r5t",
+                "displayName": "מערכת בדיקה",
+                "distantions": [
+                    "shlomo@neuberger.co.il",
+                    ""
+                ]
+            });
+
+            var xhr = new XMLHttpRequest();
+            xhr.withCredentials = true;
+
+            xhr.addEventListener("readystatechange", function () {
+                if (this.readyState === 4) {
+                    console.log(this.responseText);
+                }
+            });
+
+            xhr.open("POST", "/api/email");
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.send(data);
+        }
+    </script>
+    <div>
+        <input id="file" type="file" multiple />
+        <button onclick="f()">send</button>
+    </div>
+</body>
+</html>

@@ -18,7 +18,10 @@ namespace EmailService.Controllers
             public string subject { get; set; }
             public string body { get; set; }
             public string[] distantions { get; set; }
+            public string[] cc { get; set; }
+            public string[] bcc { get; set; }
             public string emailUserAdress { get; set; }
+            public string[] dirs { get; set; }
             public string emailPass { get; set; }
             public string displayName { get; set; }//optinal defualt same as emailUserAdress
             public string smtpDomain { get; set; } //optinal  defualt is Gmail
@@ -49,6 +52,7 @@ namespace EmailService.Controllers
             string jsonEmail = string.Empty;
             string ErrorFiles = string.Empty;
             jsonEmail = httpRequest.Unvalidated.Form[EMAIL_PARAMATER_VALUE];
+
             if (httpRequest.Files.Count > 0 || jsonEmail != null)
             { 
                 foreach (string fileName in httpRequest.Files)
@@ -65,7 +69,7 @@ namespace EmailService.Controllers
                         ErrorFiles += $"{postedFile.FileName} too big";
                     }
                 }
-                jsonEmail = httpRequest.Unvalidated.Form["EMAIL_PARAMATER_VALUE"];
+                //jsonEmail = httpRequest.Unvalidated.Form["EMAIL_PARAMATER_VALUE"];
             }
             else
             {
@@ -73,18 +77,58 @@ namespace EmailService.Controllers
             }
             
             Email e = JsonSerializer.Deserialize<Email>(jsonEmail);
+            List<string> fileError = new List<string>();
+            if(e.dirs?.Length > 0)
+            {
+                
+                foreach (string dir in e.dirs)
+                {
+                    try {
+                        System.IO.FileStream file = System.IO.File.Open(dir, System.IO.FileMode.Open);
+                        if (file.Length < MAX_SIZE_OF_FILE_BYTES)
+                            attachments.Add(new Attachment(file, System.IO.Path.GetFileName(dir)));
+
+                    }catch (Exception exe)
+                    {
+                        fileError.Add($"\"{System.IO.Path.GetFileName(dir)}\":\"{exe.Message}\"");
+                    }
+                }
+            }
+
             if (e.isValid())
             {
                 HttpContext.Current.Response.StatusCode = 200;
                 string res = SendAlertEmail(e, attachments);
-                return res;
+                string fileRes = fileError.Count > 0 ? ",\"file Error\":\"{" + fileToJString(fileError)+ "}\"}" : "}";
+                string s = "{\"email\":" + res + fileRes;
+                return s;
             }
             else
             {
                 HttpContext.Current.Response.StatusCode = 400;
-                return "{\"Error\":\"Invalid email parms\"";
+                return "{\"Error\":\"Invalid email params\"";
             }
         }
+
+
+        private string fileToJString(List<string> inData)
+        {
+            if (inData.Count == 0)
+            {
+                return string.Empty;
+            }
+            string result = string.Empty;
+            string[] data = inData.ToArray();
+            for (int i = 0; i < inData.Count-2; i++)
+            {
+                result += $"{data[i]},";
+            }
+            result += $"{data[inData.Count - 1]}";
+            return result;
+
+
+        }
+
 
         private string SendAlertEmail(Email email,List<Attachment> attachments)
         {
@@ -111,6 +155,20 @@ namespace EmailService.Controllers
                             }
                         }
                     }
+                    if(email.cc?.Length > 0)
+                    {
+                        foreach (string c in email.cc)
+                        {
+                            mail.CC.Add(c);
+                        }
+                    }
+                    if (email.bcc?.Length > 0)
+                    {
+                        foreach (string c in email.bcc)
+                        {
+                            mail.Bcc.Add(c);
+                        }
+                    }
                     mail.Subject = email.subject;
                     mail.IsBodyHtml = true;
                     mail.Body = email.body;
@@ -119,9 +177,7 @@ namespace EmailService.Controllers
                     {
                         mail.Attachments.Add(attachment);
                     }
-
-
-
+                    
                     SmtpServer.Port = 587;
                     SmtpServer.Credentials = new System.Net.NetworkCredential(email.emailUserAdress, email.emailPass);
                     SmtpServer.EnableSsl = true;

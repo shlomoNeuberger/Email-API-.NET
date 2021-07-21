@@ -6,19 +6,11 @@ using System.Web.Mvc;
 
 namespace EmailService.Controllers
 {
-    public class HomeController : Controller
+    public class TestController : Controller
     {
+        // GET: Test
         public ActionResult Index()
         {
-            ViewBag.Title = "Home Page";
-
-            return View();
-        }
-
-        public ActionResult Test()
-        {
-            ViewBag.Title = "Test Page";
-
             return View();
         }
     }
